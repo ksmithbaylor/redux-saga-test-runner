@@ -12,6 +12,8 @@ any of the steps in our sagas, our tests would fail unnecessarily. This allows
 the tests to be written in a generic way so the saga's behavior is tested, not
 the exact implementation.
 
+Optionally integrate with tape for even more convenient testing
+
 ## Installation
 
 ```

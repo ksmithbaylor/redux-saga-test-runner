@@ -15,14 +15,11 @@
   "keywords": [
     "tap",
     "tape",
-    "scenario",
-    "scenarios",
-    "outline",
-    "outlines",
-    "cucumber",
     "test",
     "tests",
-    "testing"
+    "testing",
+    "redux",
+    "redux-saga"
   ],
   "author": "Kevin Smith",
   "license": "MIT",
