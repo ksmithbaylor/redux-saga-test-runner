@@ -1,0 +1,48 @@
+{
+  "name": "redux-saga-test-runner",
+  "version": "0.1.0",
+  "description": "Automatically test your sagas without worrying about ordering",
+  "main": "dist/index.js",
+  "scripts": {
+    "lint": "eslint *.js",
+    "build": "babel src --out-dir dist",
+    "test": "tape -r babel-register tests | tap-dot"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ksmithbaylor/redux-saga-test-runner.git"
+  },
+  "keywords": [
+    "tap",
+    "tape",
+    "scenario",
+    "scenarios",
+    "outline",
+    "outlines",
+    "cucumber",
+    "test",
+    "tests",
+    "testing"
+  ],
+  "author": "Kevin Smith",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ksmithbaylor/redux-saga-test-runner/issues"
+  },
+  "homepage": "https://github.com/ksmithbaylor/redux-saga-test-runner#readme",
+  "devDependencies": {
+    "babel-cli": "^6.11.4",
+    "babel-eslint": "^6.1.2",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-stage-1": "^6.5.0",
+    "babel-register": "^6.11.6",
+    "eslint": "^3.2.0",
+    "eslint-config-airbnb": "^9.0.1",
+    "tap-dot": "^1.0.5",
+    "tape": "^4.6.0"
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.9.1",
+    "deep-equal": "^1.0.1"
+  }
+}
