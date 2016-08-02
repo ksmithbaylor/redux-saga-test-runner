@@ -1,6 +1,6 @@
 {
   "name": "redux-saga-test-runner",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Automatically test your sagas without worrying about ordering",
   "main": "dist/index.js",
   "scripts": {
