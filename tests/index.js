@@ -1,4 +1,4 @@
-import test from 'tape';
+import test from 'tape-catch';
 import { scenario, scenarioOutline } from 'tape-scenario';
 
 import SagaRunner from '../src';

@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint *.js",
     "build": "babel src --out-dir dist",
-    "test": "tape -r babel-register tests | tap-dot"
+    "test": "tape -r babel-register tests | tap-difflet"
   },
   "repository": {
     "type": "git",
@@ -36,8 +36,10 @@
     "eslint": "^3.2.0",
     "eslint-config-airbnb-base": "^5.0.1",
     "eslint-plugin-import": "^1.12.0",
+    "tap-difflet": "^0.6.0",
     "tap-dot": "^1.0.5",
     "tape": "^4.6.0",
+    "tape-catch": "^1.0.6",
     "tape-scenario": "^0.2.3"
   },
   "dependencies": {
