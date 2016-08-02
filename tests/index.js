@@ -9,6 +9,15 @@ function *countToThreeSaga() {
   yield 2;
   yield 3;
 }
+function *catchSaga() {
+  try {
+    yield 'hello';
+    yield 'question';
+    yield 'never reached';
+  } catch (err) {
+    yield 'caught';
+  }
+}
 const grabBag = [
   null, undefined, 42, 'hello', {}, [], Symbol(),
   { a: 1 }, Object.create(null),
@@ -83,28 +92,29 @@ scenarioOutline(test, 'SagaRunner: can provide an answer for yielded values', {
   t.end();
 });
 
-scenarioOutline(test, 'SagaRunner: can throw in response to values', {
-  question: grabBag
-}, (t, { question }) => {
-  const neverReached = Symbol();
-
-  function *echoSaga() {
-    try {
-      yield question;
-      yield neverReached;
-    } catch (thing) {
-      yield thing;
-    }
-  }
-
-  const expected = Symbol();
-  const runner = new SagaRunner(echoSaga());
-  runner.expects(question).throws(expected);
+test('SagaRunner: can throw in response to a specific value', t => {
+  const runner = new SagaRunner(catchSaga());
+  runner.expects('hello');
+  runner.expects('question').throws();
+  runner.expects('caught');
   runner.run();
 
-  t.assert(runner.yielded(question));
-  t.assert(runner.yielded(expected));
-  t.assert(!runner.yielded(neverReached));
+  t.assert(runner.yieldedAllExpected());
+  t.assert(!runner.yielded('never reached'));
+  t.end();
+});
+
+test('SagaRunner: can throw an exception unconditionally', t => {
+  const error = Symbol();
+  const runner = new SagaRunner(catchSaga());
+  runner.expects('caught')
+  runner.throws();
+  runner.run();
+
+  t.assert(runner.yieldedAllExpected());
+  t.assert(!runner.yielded('hello'));
+  t.assert(!runner.yielded('question'));
+  t.assert(!runner.yielded('never reached'));
   t.end();
 });
 

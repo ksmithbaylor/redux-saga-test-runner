@@ -62,7 +62,10 @@ class SagaRunner {
     this.assertHasNotRun('only allowed to run once');
     this.yieldedValues = [];
 
-    let iterator = this.saga.next();
+    let iterator = (this.alwaysThrow === UNINITIALIZED)
+      ? this.saga.next()
+      : this.saga.throw(this.alwaysThrow);
+
     while (!iterator.done) {
       const yieldedValue = iterator.value;
       this.yieldedValues.push(yieldedValue);
@@ -71,9 +74,7 @@ class SagaRunner {
       const valueIn = map => mapDeepEqualHas(map, yieldedValue); // eslint-disable-line no-loop-func
       const getFrom = map => mapDeepEqualGet(map, yieldedValue); // eslint-disable-line no-loop-func
 
-      if (this.alwaysThrow !== UNINITIALIZED) {
-        iterator = this.saga.throw(this.alwaysThrow);
-      } else if (this.alwaysReturn !== UNINITIALIZED) {
+      if (this.alwaysReturn !== UNINITIALIZED) {
         iterator = this.saga.next(this.alwaysReturn);
       } else if (valueIn(this.tantrums)) {
         iterator = this.saga.throw(getFrom(this.tantrums));
