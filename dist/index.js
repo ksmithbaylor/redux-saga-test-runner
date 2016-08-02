@@ -94,7 +94,7 @@ var SagaRunner = function () {
       this.assertHasNotRun('only allowed to run once');
       this.yieldedValues = [];
 
-      var iterator = this.saga.next();
+      var iterator = this.alwaysThrow === UNINITIALIZED ? this.saga.next() : this.saga.throw(this.alwaysThrow);
 
       var _loop = function _loop() {
         var yieldedValue = iterator.value;
@@ -108,9 +108,7 @@ var SagaRunner = function () {
           return mapDeepEqualGet(map, yieldedValue);
         }; // eslint-disable-line no-loop-func
 
-        if (_this.alwaysThrow !== UNINITIALIZED) {
-          iterator = _this.saga.throw(_this.alwaysThrow);
-        } else if (_this.alwaysReturn !== UNINITIALIZED) {
+        if (_this.alwaysReturn !== UNINITIALIZED) {
           iterator = _this.saga.next(_this.alwaysReturn);
         } else if (valueIn(_this.tantrums)) {
           iterator = _this.saga.throw(getFrom(_this.tantrums));
