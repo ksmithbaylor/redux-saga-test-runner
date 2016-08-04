@@ -6,7 +6,8 @@
   "scripts": {
     "lint": "eslint *.js",
     "build": "babel src --out-dir dist",
-    "test": "tape -r babel-register tests | tap-difflet"
+    "test": "tape -r babel-register tests | tap-difflet",
+    "test:watch": "clear && chokidar '{src,tests}/**/*' -c 'clear && echo Running Tests... && npm run -s test'"
   },
   "repository": {
     "type": "git",
@@ -33,6 +34,7 @@
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-stage-1": "^6.5.0",
     "babel-register": "^6.11.6",
+    "chokidar-cli": "^1.2.0",
     "eslint": "^3.2.0",
     "eslint-config-airbnb-base": "^5.0.1",
     "eslint-plugin-import": "^1.12.0",
