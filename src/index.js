@@ -149,7 +149,7 @@ function mapDeepEqualIterate(ifPresent, ifNotPresent) {
   return function mapIterator(map, relevantKey) {
     for (const key of map.keys()) {
       if (deepEqual(key, relevantKey)) {
-        return ifPresent(map, relevantKey);
+        return ifPresent(map, key);
       }
     }
     return ifNotPresent(map, relevantKey);
