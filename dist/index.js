@@ -199,7 +199,7 @@ function mapDeepEqualIterate(ifPresent, ifNotPresent) {
         var key = _step.value;
 
         if ((0, _deepEqual2.default)(key, relevantKey)) {
-          return ifPresent(map, relevantKey);
+          return ifPresent(map, key);
         }
       }
     } catch (err) {
