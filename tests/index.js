@@ -75,7 +75,7 @@ test('SagaRunner: throws if calling methods in incorrect orders', t => {
   t.end();
 });
 
-scenarioOutline(test, 'SagaRunner: can provide an answer for yielded values', {
+scenarioOutline(test, 'SagaRunner: can provide an answer for yielded values: ', {
   question: grabBag
 }, (t, { question }) => {
   function *echoSaga() {
