@@ -5,7 +5,7 @@ const noMoreMethodsAfter = last => new Proxy({}, {
   // Sort of like method_missing in ruby
   get() {
     return () => {
-      throw new Error(`SagaRunner: no chained method calls allowed after \`${last}\``);
+      error(`No chained method calls allowed after \`${last}\``);
     };
   }
 });
@@ -100,9 +100,8 @@ class SagaRunner {
   // Assertions for internal use
 
   assertValidSaga(args) {
-    if (args.length !== 1) { // didn't pass any arguments, or passed too many
-      throw new Error('SagaRunner: must pass exactly one argument (the saga ' +
-                      'instance) to the constructor');
+    if (args.length !== 1) {
+      error('Must pass exactly one argument (the saga instance) to the constructor');
     }
 
     const saga = args[0];
@@ -110,27 +109,27 @@ class SagaRunner {
     if (saga
         && saga.constructor
         && saga.constructor.name === 'GeneratorFunction') {
-      throw new Error('SagaRunner: make sure to call the saga to get an ' +
-                      'instance, not pass in the generator function itself');
+      error('Make sure to call the saga to get an instance, ' +
+            'not pass in the generator function itself');
     }
 
     if (!saga
         || typeof saga !== 'object'
         || !saga.constructor
         || saga.constructor[Symbol.toStringTag] !== 'GeneratorFunction') {
-      throw new Error('SagaRunner: invalid constructor argument');
+      error('Invalid constructor argument');
     }
   }
 
   assertAlreadyRan(message) {
     if (this.yieldedValues === UNINITIALIZED) {
-      throw new Error(`SagaRunner: ${message}`);
+      error(message);
     }
   }
 
   assertHasNotRun(message) {
     if (this.yieldedValues !== UNINITIALIZED) {
-      throw new Error(`SagaRunner: ${message}`);
+      error(message);
     }
   }
 }
@@ -158,6 +157,10 @@ function mapDeepEqualIterate(ifPresent, ifNotPresent) {
 
 function arrayDeepEqualIncludes(array, value) {
   return array.some(member => deepEqual(member, value));
+}
+
+function error(message) {
+  throw new Error(`SagaRunner: ${message}`);
 }
 
 export default SagaRunner;
