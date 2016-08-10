@@ -58,7 +58,7 @@ class SagaRunner {
     return noMoreMethodsAfter('throws');
   }
 
-  run() {
+  run(t) {
     this.assertHasNotRun('only allowed to run once');
     this.yieldedValues = [];
 
@@ -83,6 +83,11 @@ class SagaRunner {
       } else {
         iterator = this.saga.next();
       }
+    }
+
+    if (t) {
+      this.assertValidTestObject(t);
+      t.assert(this.yieldedAllExpected(), 'Yielded all expected values');
     }
   }
 
@@ -131,6 +136,14 @@ class SagaRunner {
     if (this.yieldedValues !== UNINITIALIZED) {
       error(message);
     }
+  }
+
+  assertValidTestObject(t) {
+    ['assert', 'deepEqual'].forEach(method => {
+      if (!t[method]) {
+        error(`Test object must have a method called \`${method}\``);
+      }
+    });
   }
 }
 
