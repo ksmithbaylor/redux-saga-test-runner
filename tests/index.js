@@ -157,3 +157,29 @@ test('SagaRunner: detects if not all expected values were yielded', t => {
   t.assert(completeRunner.yieldedAllExpected());
   t.end();
 });
+
+scenario(test, 'SagaRunner: assertValidTestObject ', {
+  'with a valid object': {
+    testObject: { assert() {}, deepEqual() {} },
+    shouldThrow: false
+  },
+  'with an empty object': {
+    testObject: {},
+    shouldThrow: true
+  },
+  'with non-method members': {
+    testObject: { assert: true, deepEqual: 'lol' },
+    shouldThrow: true
+  }
+}, (t, { testObject, shouldThrow }) => {
+  const runner = new SagaRunner(emptySaga());
+  if (shouldThrow) {
+    t.throws(
+      () => runner.assertValidTestObject(testObject),
+      /Test object must have a method called/
+    );
+  } else {
+    t.doesNotThrow(() => runner.assertValidTestObject(testObject));
+  }
+  t.end()
+})

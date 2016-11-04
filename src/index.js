@@ -140,7 +140,7 @@ class SagaRunner {
 
   assertValidTestObject(t) {
     ['assert', 'deepEqual'].forEach(method => {
-      if (!t[method]) {
+      if (!(method in t) || typeof t[method] !== 'function') {
         error(`Test object must have a method called \`${method}\``);
       }
     });
