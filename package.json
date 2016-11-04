@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint *.js",
     "build": "babel src --out-dir dist",
-    "test": "tape -r babel-register tests | tap-difflet",
+    "test": "tape -r babel-register tests | tap-summary",
     "test:watch": "clear && chokidar '{src,tests}/**/*' -c 'clear && echo Running Tests... && npm run -s test'"
   },
   "repository": {
@@ -40,6 +40,7 @@
     "eslint-plugin-import": "^1.12.0",
     "tap-difflet": "^0.6.0",
     "tap-dot": "^1.0.5",
+    "tap-summary": "^3.0.1",
     "tape": "^4.6.0",
     "tape-catch": "^1.0.6",
     "tape-scenario": "^0.2.3"
