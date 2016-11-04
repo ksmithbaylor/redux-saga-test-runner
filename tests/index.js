@@ -34,15 +34,15 @@ test('SagaRunner: constructor sets valid saga correctly', t => {
 
 scenario(test, 'SagaRunner: invalid constructor arguments: ', {
   'no arguments': {
-    error: /must pass exactly one argument/
+    error: /Must pass exactly one argument/
   },
   'raw (uncalled) generator function': {
     sagas: [emptySaga, countToThreeSaga],
-    error: /make sure to call the saga/
+    error: /Make sure to call the saga/
   },
   'other random input': {
     sagas: [null, undefined, 42, 'hello', {}, Object.create(null), Symbol()],
-    error: /invalid constructor argument/
+    error: /Invalid constructor argument/
   }
 
 }, (t, { sagas, error }) => {
@@ -122,11 +122,19 @@ test('SagaRunner: only allows one of {returns,throws} to be chained', t => {
   const runner = new SagaRunner(emptySaga());
   t.throws(
     () => runner.expects(1).returns(2).throws(3),
-    /no chained method calls allowed after `returns`/
+    /No chained method calls allowed after `returns`/
   );
   t.throws(
     () => runner.expects(1).throws(2).returns(3),
-    /no chained method calls allowed after `throws`/
+    /No chained method calls allowed after `throws`/
+  );
+  t.throws(
+    () => runner.expects(1).returns(2).throws(3),
+    /No chained method calls allowed after `returns`/
+  );
+  t.throws(
+    () => runner.expects(1).throws(2).returns(3),
+    /No chained method calls allowed after `throws`/
   );
   t.end();
 });

@@ -43,7 +43,7 @@ class SagaRunner {
   returns(reply) {
     this.assertHasNotRun('cannot call `returns` after `run`');
     this.alwaysReturn = reply;
-    return noMoreMethodsAfter('throws');
+    return noMoreMethodsAfter('returns');
   }
 
   returnsForExpectation(value, reply) {
