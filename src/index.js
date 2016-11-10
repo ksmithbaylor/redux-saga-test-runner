@@ -1,4 +1,3 @@
-import 'babel-polyfill';
 import deepEqual from 'deep-equal';
 
 const noMoreMethodsAfter = last => new Proxy({}, {
@@ -11,6 +10,7 @@ const noMoreMethodsAfter = last => new Proxy({}, {
 });
 
 const UNINITIALIZED = Symbol();
+const WRAPPED = Symbol();
 
 class SagaRunner {
   replies = new Map();  // things to reply with
@@ -19,6 +19,7 @@ class SagaRunner {
   yieldedValues = UNINITIALIZED;
   alwaysThrow = UNINITIALIZED;
   alwaysReturn = UNINITIALIZED;
+  currentState = UNINITIALIZED;
 
   constructor(saga) {
     this.assertValidSaga(arguments);
@@ -27,10 +28,11 @@ class SagaRunner {
 
   expects(value) {
     this.assertHasNotRun('cannot call `expects` after `run`');
-    this.expectations.push(value);
+    const expectation = wrapValue(value, this.currentState);
+    this.expectations.push(expectation);
     return {
-      returns: this.returnsForExpectation.bind(this, value),
-      throws: this.throwsForExpectation.bind(this, value)
+      returns: this.returnsForExpectation.bind(this, expectation),
+      throws: this.throwsForExpectation.bind(this, expectation)
     };
   }
 
@@ -46,16 +48,20 @@ class SagaRunner {
     return noMoreMethodsAfter('returns');
   }
 
-  returnsForExpectation(value, reply) {
+  returnsForExpectation(expectation, reply) {
     this.assertHasNotRun('cannot call `returns` after `run`');
-    this.replies.set(value, reply);
+    this.replies.set(expectation, reply);
     return noMoreMethodsAfter('returns');
   }
 
-  throwsForExpectation(value, reply) {
+  throwsForExpectation(expectation, reply) {
     this.assertHasNotRun('cannot call `throws` after `run`');
-    this.tantrums.set(value, reply);
+    this.tantrums.set(expectation, reply);
     return noMoreMethodsAfter('throws');
+  }
+
+  setState(state) {
+    this.currentState = state;
   }
 
   run(t) {
@@ -67,7 +73,7 @@ class SagaRunner {
       : this.saga.throw(this.alwaysThrow);
 
     while (!iterator.done) {
-      const yieldedValue = iterator.value;
+      const yieldedValue = wrapValue(iterator.value, UNINITIALIZED);
       this.yieldedValues.push(yieldedValue);
 
       // Convenience functions for this yieldedValue
@@ -160,7 +166,7 @@ const mapDeepEqualGet = mapDeepEqualIterate(
 function mapDeepEqualIterate(ifPresent, ifNotPresent) {
   return function mapIterator(map, relevantKey) {
     for (const key of map.keys()) {
-      if (deepEqual(key, relevantKey)) {
+      if (areEqual(key, relevantKey)) {
         return ifPresent(map, key);
       }
     }
@@ -169,11 +175,37 @@ function mapDeepEqualIterate(ifPresent, ifNotPresent) {
 }
 
 function arrayDeepEqualIncludes(array, value) {
-  return array.some(member => deepEqual(member, value));
+  return array.some(member => areEqual(member, value));
+}
+
+function areEqual(candidate, lookingFor) {
+  if (!hasProp(candidate, WRAPPED)) candidate = wrapValue(candidate, {});
+  if (!hasProp(lookingFor, WRAPPED)) lookingFor = wrapValue(lookingFor, {});
+
+  if (hasProp(candidate.value, 'SELECT') && hasProp(lookingFor.value, 'SELECT')) {
+    return selectorIsEqual(candidate, lookingFor);
+  }
+
+  return deepEqual(candidate.value, lookingFor.value);
+}
+
+function selectorIsEqual(candidate, lookingFor) {
+  return deepEqual(
+    candidate.value.SELECT.selector(lookingFor.state),
+    lookingFor.value.SELECT.selector(lookingFor.state)
+  );
 }
 
 function error(message) {
   throw new Error(`SagaRunner: ${message}`);
+}
+
+function hasProp(obj, prop) {
+  return obj !== null && typeof obj === 'object' && prop in obj;
+}
+
+function wrapValue(value, state) {
+  return { [WRAPPED]: true, value, state };
 }
 
 export default SagaRunner;

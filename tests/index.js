@@ -1,5 +1,8 @@
 import test from 'tape-catch';
 import { scenario, scenarioOutline } from 'tape-scenario';
+import complexSaga, { complexHelper } from './fixtures/complexSaga';
+import { select, put, fork, spawn, take, call } from 'redux-saga/effects';
+import sinon from 'sinon';
 
 import SagaRunner from '../src';
 
@@ -144,7 +147,6 @@ test('SagaRunner: detects if not all expected values were yielded', t => {
   incompleteRunner.expects(1).returns(2);
   incompleteRunner.run();
 
-  t.deepEqual(incompleteRunner.expectations, [1]);
   t.assert(!incompleteRunner.yieldedAllExpected());
 
   const completeRunner = new SagaRunner(countToThreeSaga());
@@ -153,7 +155,6 @@ test('SagaRunner: detects if not all expected values were yielded', t => {
   completeRunner.expects(3).returns('three');
   completeRunner.run();
 
-  t.deepEqual(completeRunner.expectations, [1, 2, 3]);
   t.assert(completeRunner.yieldedAllExpected());
   t.end();
 });
@@ -182,4 +183,23 @@ scenario(test, 'SagaRunner: assertValidTestObject ', {
     t.doesNotThrow(() => runner.assertValidTestObject(testObject));
   }
   t.end()
-})
+});
+
+test(test, 'SagaRunner: testing a select', t => {
+  let selectorCalledWith = null;
+  const selector = state => {
+    selectorCalledWith = state;
+    return state.number;
+  }
+
+  const runner = new SagaRunner(complexSaga());
+  runner.setState({ number: 42 });
+  runner.expects(select(selector));
+  runner.run();
+  t.assert(runner.yieldedAllExpected());
+  t.deepEqual(selectorCalledWith, { number: 42 });
+
+  t.end();
+});
+
+
