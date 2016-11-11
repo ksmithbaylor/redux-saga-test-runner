@@ -2,7 +2,6 @@ import test from 'tape-catch';
 import { scenario, scenarioOutline } from 'tape-scenario';
 import complexSaga, { complexHelper } from './fixtures/complexSaga';
 import { select, put, fork, spawn, take, call } from 'redux-saga/effects';
-import sinon from 'sinon';
 
 import SagaRunner from '../src';
 
@@ -201,5 +200,3 @@ test(test, 'SagaRunner: testing a select', t => {
 
   t.end();
 });
-
-
