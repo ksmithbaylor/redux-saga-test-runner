@@ -1,14 +1,5 @@
 import deepEqual from 'deep-equal';
 
-const noMoreMethodsAfter = last => new Proxy({}, {
-  // Sort of like method_missing in ruby
-  get() {
-    return () => {
-      error(`No chained method calls allowed after \`${last}\``);
-    };
-  }
-});
-
 const UNINITIALIZED = Symbol();
 const WRAPPED = Symbol();
 
@@ -206,6 +197,18 @@ function hasProp(obj, prop) {
 
 function wrapValue(value, state) {
   return { [WRAPPED]: true, value, state };
+}
+
+function noMoreMethodsAfter(last) {
+  const ret = {};
+  Object.getOwnPropertyNames(SagaRunner.prototype).forEach(method => {
+    Object.defineProperty(ret, method, {
+      get() {
+        error(`No chained method calls allowed after \`${last}\``);
+      }
+    });
+  });
+  return ret;
 }
 
 export default SagaRunner;
