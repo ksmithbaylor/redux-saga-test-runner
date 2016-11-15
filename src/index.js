@@ -83,8 +83,7 @@ class SagaRunner {
     }
 
     if (t) {
-      this.assertValidTestObject(t);
-      t.assert(this.yieldedAllExpected(), 'Yielded all expected values');
+      this.runAssertions(t);
     }
   }
 
@@ -93,9 +92,18 @@ class SagaRunner {
     return arrayDeepEqualIncludes(this.yieldedValues, value);
   }
 
-  yieldedAllExpected() {
+  runAssertions(t) {
+    this.assertValidTestObject(t);
     this.assertAlreadyRan('must call `run` before checking yielded values');
-    return this.expectations.every(this.yielded.bind(this));
+    let success = true;
+    this.expectations.forEach(expectation => {
+      const yieldedThisOne = this.yielded(expectation);
+      t.assert(yieldedThisOne, `yielded ${JSON.stringify(expectation)}`);
+      if (!yieldedThisOne) {
+        success = false;
+      }
+    });
+    return success;
   }
 
   //----------------------------------------------------------------------------

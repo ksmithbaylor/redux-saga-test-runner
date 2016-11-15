@@ -25,6 +25,7 @@ const grabBag = [
   { a: 1 }, Object.create(null),
   function foo() {}, function *bar() {}
 ];
+const fakeT = { assert() {}, deepEqual() {} };
 
 test('SagaRunner: constructor sets valid saga correctly', t => {
   const sagaInstance = emptySaga();
@@ -69,7 +70,7 @@ test('SagaRunner: empty run does not cause exceptions', t => {
 test('SagaRunner: throws if calling methods in incorrect orders', t => {
   const runner = new SagaRunner(emptySaga());
   t.throws(() => runner.yielded(42), /must call `run` before checking/);
-  t.throws(() => runner.yieldedAllExpected(), /must call `run` before checking/);
+  t.throws(() => runner.runAssertions(fakeT), /must call `run` before checking/);
   runner.run();
   t.throws(() => runner.expects(42), /cannot call `expects` after `run`/);
   t.throws(() => runner.returns(42), /cannot call `returns` after `run`/);
@@ -101,7 +102,7 @@ test('SagaRunner: can throw in response to a specific value', t => {
   runner.expects('caught');
   runner.run();
 
-  t.assert(runner.yieldedAllExpected());
+  t.assert(runner.runAssertions(fakeT));
   t.assert(!runner.yielded('never reached'));
   t.end();
 });
@@ -113,7 +114,7 @@ test('SagaRunner: can throw an exception unconditionally', t => {
   runner.throws();
   runner.run();
 
-  t.assert(runner.yieldedAllExpected());
+  t.assert(runner.runAssertions(fakeT));
   t.assert(!runner.yielded('hello'));
   t.assert(!runner.yielded('question'));
   t.assert(!runner.yielded('never reached'));
@@ -146,7 +147,7 @@ test('SagaRunner: detects if not all expected values were yielded', t => {
   incompleteRunner.expects(1).returns(2);
   incompleteRunner.run();
 
-  t.assert(!incompleteRunner.yieldedAllExpected());
+  t.assert(!incompleteRunner.runAssertions(fakeT));
 
   const completeRunner = new SagaRunner(countToThreeSaga());
   completeRunner.expects(1).returns('one');
@@ -154,7 +155,7 @@ test('SagaRunner: detects if not all expected values were yielded', t => {
   completeRunner.expects(3).returns('three');
   completeRunner.run();
 
-  t.assert(completeRunner.yieldedAllExpected());
+  t.assert(completeRunner.runAssertions(fakeT));
   t.end();
 });
 
@@ -195,7 +196,7 @@ test(test, 'SagaRunner: testing a select', t => {
   runner.setState({ number: 42 });
   runner.expects(select(selector));
   runner.run();
-  t.assert(runner.yieldedAllExpected());
+  t.assert(runner.runAssertions(fakeT));
   t.deepEqual(selectorCalledWith, { number: 42 });
 
   t.end();
