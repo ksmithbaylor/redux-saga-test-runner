@@ -9,7 +9,7 @@ function *complexSaga() {
     const number = yield select(state => state.number);
     yield put({ type: 'NUMBER_CHANGED', number: number + 1 });
 
-    const { fruit } = take('FRUIT_CHOSEN');
+    const { fruit } = yield take('FRUIT_CHOSEN');
     yield call(complexHelper, fruit);
     yield fork(complexHelper, fruit),
     yield spawn(complexHelper, fruit)
